@@ -18,6 +18,10 @@ class Client
 
     private ?Clob $clobClient = null;
 
+    private ?Data $dataClient = null;
+
+    private ?Bridge $bridgeClient = null;
+
     private ?ClobAuthenticator $clobAuthenticator = null;
 
     /**
@@ -27,7 +31,9 @@ class Client
         ?string $apiKey = null,
         array $options = [],
         ?HttpClientInterface $gammaHttpClient = null,
-        ?HttpClientInterface $clobHttpClient = null
+        ?HttpClientInterface $clobHttpClient = null,
+        ?HttpClientInterface $dataHttpClient = null,
+        ?HttpClientInterface $bridgeHttpClient = null
     ) {
         $this->config = new Config($apiKey, $options);
 
@@ -37,6 +43,14 @@ class Client
 
         if ($clobHttpClient !== null) {
             $this->clobClient = new Clob($this->config, $clobHttpClient);
+        }
+
+        if ($dataHttpClient !== null) {
+            $this->dataClient = new Data($this->config, $dataHttpClient);
+        }
+
+        if ($bridgeHttpClient !== null) {
+            $this->bridgeClient = new Bridge($this->config, $bridgeHttpClient);
         }
     }
 
@@ -95,5 +109,23 @@ class Client
         }
 
         return $this->clobClient;
+    }
+
+    public function data(): Data
+    {
+        if ($this->dataClient === null) {
+            $this->dataClient = new Data($this->config);
+        }
+
+        return $this->dataClient;
+    }
+
+    public function bridge(): Bridge
+    {
+        if ($this->bridgeClient === null) {
+            $this->bridgeClient = new Bridge($this->config);
+        }
+
+        return $this->bridgeClient;
     }
 }
