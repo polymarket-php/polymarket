@@ -20,6 +20,8 @@ class Client
 
     private ?Bridge $bridgeClient = null;
 
+    private ?Data $dataClient = null;
+
     private ?ClobAuthenticator $clobAuthenticator = null;
 
     /**
@@ -30,7 +32,8 @@ class Client
         array $options = [],
         ?HttpClientInterface $gammaHttpClient = null,
         ?HttpClientInterface $clobHttpClient = null,
-        ?HttpClientInterface $bridgeHttpClient = null
+        ?HttpClientInterface $bridgeHttpClient = null,
+        ?HttpClientInterface $dataHttpClient = null
     ) {
         $this->config = new Config($apiKey, $options);
 
@@ -44,6 +47,10 @@ class Client
 
         if ($bridgeHttpClient instanceof HttpClientInterface) {
             $this->bridgeClient = new Bridge($this->config, $bridgeHttpClient);
+        }
+
+        if ($dataHttpClient !== null) {
+            $this->dataClient = new Data($this->config, $dataHttpClient);
         }
     }
 
@@ -114,5 +121,14 @@ class Client
         }
 
         return $this->bridgeClient;
+    }
+
+    public function data(): Data
+    {
+        if ($this->dataClient === null) {
+            $this->dataClient = new Data($this->config);
+        }
+
+        return $this->dataClient;
     }
 }
