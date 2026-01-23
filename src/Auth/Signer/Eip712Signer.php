@@ -213,17 +213,28 @@ class Eip712Signer
     private function encodeValue(string $type, mixed $value): string
     {
         if ($type === 'string') {
+            if (!is_string($value)) {
+                throw new InvalidArgumentException("Expected string, got " . get_debug_type($value));
+            }
+
             return Keccak::hash($value, 256);
         }
 
         if ($type === 'address') {
+            if (!is_string($value)) {
+                throw new InvalidArgumentException("Expected string, got " . get_debug_type($value));
+            }
             $address = str_replace('0x', '', $value);
 
             return str_pad($address, 64, '0', STR_PAD_LEFT);
         }
 
         if ($type === 'uint256') {
-            return str_pad(dechex((int) $value), 64, '0', STR_PAD_LEFT);
+            if (!is_int($value)) {
+                throw new InvalidArgumentException("Expected uint256, got " . get_debug_type($value));
+            }
+
+            return str_pad(dechex($value), 64, '0', STR_PAD_LEFT);
         }
 
         throw new InvalidArgumentException("Unsupported type: $type");

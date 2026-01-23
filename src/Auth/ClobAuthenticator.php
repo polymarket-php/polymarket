@@ -66,6 +66,7 @@ class ClobAuthenticator
                 );
             }
 
+            /** @var array<string, mixed> $data */
             return ApiCredentials::fromArray($data);
         } catch (GuzzleException $e) {
             throw ClobAuthenticationException::credentialDerivationFailed($e->getMessage());
@@ -95,6 +96,7 @@ class ClobAuthenticator
                 );
             }
 
+            /** @var array<string, mixed> $data */
             return ApiCredentials::fromArray($data);
         } catch (GuzzleException $e) {
             throw ClobAuthenticationException::credentialDerivationFailed($e->getMessage());

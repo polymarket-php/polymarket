@@ -27,7 +27,16 @@ class Response
     public function json(): array
     {
         try {
-            return json_decode($this->body, true, 512, JSON_THROW_ON_ERROR);
+            $decoded = json_decode($this->body, true, 512, JSON_THROW_ON_ERROR);
+            if (!is_array($decoded)) {
+                throw new JsonParseException(
+                    message: 'JSON response is not an array',
+                    code: $this->statusCode
+                );
+            }
+
+            /** @var array<string, mixed> $decoded */
+            return $decoded;
         } catch (JsonException $e) {
             throw new JsonParseException(
                 message: 'Failed to parse JSON response: ' . $e->getMessage() . '. Response body: ' . substr($this->body, 0, 200),
@@ -62,6 +71,8 @@ class Response
 
     public function header(string $name): ?string
     {
-        return $this->headers[$name] ?? null;
+        $value = $this->headers[$name] ?? null;
+
+        return is_string($value) ? $value : null;
     }
 }
