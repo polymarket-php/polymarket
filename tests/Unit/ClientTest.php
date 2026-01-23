@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
+use Danielgnh\PolymarketPhp\Bridge;
 use Danielgnh\PolymarketPhp\Client;
 use Danielgnh\PolymarketPhp\Clob;
 use Danielgnh\PolymarketPhp\Gamma;
+use Danielgnh\PolymarketPhp\Resources\Bridge\Deposits;
 use Danielgnh\PolymarketPhp\Resources\Clob\Orders;
 use Danielgnh\PolymarketPhp\Resources\Gamma\Markets;
 
@@ -88,4 +90,27 @@ it('creates new resource instances on each call', function () {
     expect($markets1)->not->toBe($markets2)
         ->and($markets1)->toBeInstanceOf(Markets::class)
         ->and($markets2)->toBeInstanceOf(Markets::class);
+});
+
+it('provides bridge client', function () {
+    $client = new Client();
+    $bridge = $client->bridge();
+
+    expect($bridge)->toBeInstanceOf(Bridge::class);
+});
+
+it('caches bridge client instance', function () {
+    $client = new Client();
+
+    $bridge1 = $client->bridge();
+    $bridge2 = $client->bridge();
+
+    expect($bridge1)->toBe($bridge2);
+});
+
+it('bridge client provides deposits resource', function () {
+    $client = new Client();
+    $deposits = $client->bridge()->deposits();
+
+    expect($deposits)->toBeInstanceOf(Deposits::class);
 });

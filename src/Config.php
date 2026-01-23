@@ -10,6 +10,8 @@ class Config
 
     public readonly string $clobBaseUrl;
 
+    public readonly string $bridgeBaseUrl;
+
     public readonly ?string $apiKey;
 
     public readonly int $timeout;
@@ -30,6 +32,7 @@ class Config
         $this->apiKey = $apiKey ?? ($_ENV['POLYMARKET_API_KEY'] ?? null);
         $this->gammaBaseUrl = $options['gamma_base_url'] ?? 'https://gamma-api.polymarket.com';
         $this->clobBaseUrl = $options['clob_base_url'] ?? 'https://clob.polymarket.com';
+        $this->bridgeBaseUrl = $options['bridge_base_url'] ?? 'https://bridge-api.polymarket.com';
         $this->timeout = $options['timeout'] ?? 30;
         $this->retries = $options['retries'] ?? 3;
         $this->verifySSL = $options['verify_ssl'] ?? true;
