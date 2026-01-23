@@ -93,8 +93,9 @@ class GuzzleHttpClient implements HttpClientInterface
     private function request(string $method, string $path, array $options = []): Response
     {
         $authHeaders = $this->getAuthHeaders($method, $path, $options);
+        $existingHeaders = $options['headers'] ?? [];
         $options['headers'] = array_merge(
-            $options['headers'] ?? [],
+            is_array($existingHeaders) ? $existingHeaders : [],
             $authHeaders
         );
 
@@ -109,9 +110,12 @@ class GuzzleHttpClient implements HttpClientInterface
 
     private function createResponse(ResponseInterface $response): Response
     {
+        /** @var array<string, array<string>> $headers */
+        $headers = $response->getHeaders();
+
         return new Response(
             statusCode: $response->getStatusCode(),
-            headers: $this->normalizeHeaders($response->getHeaders()),
+            headers: $this->normalizeHeaders($headers),
             body: $response->getBody()->getContents()
         );
     }
@@ -122,7 +126,7 @@ class GuzzleHttpClient implements HttpClientInterface
      */
     private function normalizeHeaders(array $headers): array
     {
-        return array_map(function ($values) {
+        return array_map(function (array $values): string {
             return implode(', ', $values);
         }, $headers);
     }
