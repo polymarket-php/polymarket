@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-require_once __DIR__.'/../vendor/autoload.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 use Danielgnh\PolymarketPhp\Client;
 
@@ -57,11 +57,7 @@ try {
 try {
     echo "2. Generating deposit addresses...\n";
 
-    // Your Polygon destination address (where USDC.e will be sent)
-    // WARNING: This is a placeholder address (the zero address) and MUST be replaced
-    // with your actual Polygon wallet address before using this script with real funds.
-    // Depositing to the zero address will result in permanent loss of funds.
-    $destinationAddress = '0x0000000000000000000000000000000000000000';
+    $destinationAddress = null; // Use your address here, be accurate.
     $amount = '100'; // Amount to deposit in USD
 
     $depositAddresses = $client->bridge()->deposits()->generate([
