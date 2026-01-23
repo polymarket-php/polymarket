@@ -18,8 +18,6 @@ class Client
 
     private ?Clob $clobClient = null;
 
-    private ?Data $dataClient = null;
-
     private ?Bridge $bridgeClient = null;
 
     private ?ClobAuthenticator $clobAuthenticator = null;
@@ -32,7 +30,6 @@ class Client
         array $options = [],
         ?HttpClientInterface $gammaHttpClient = null,
         ?HttpClientInterface $clobHttpClient = null,
-        ?HttpClientInterface $dataHttpClient = null,
         ?HttpClientInterface $bridgeHttpClient = null
     ) {
         $this->config = new Config($apiKey, $options);
@@ -43,10 +40,6 @@ class Client
 
         if ($clobHttpClient !== null) {
             $this->clobClient = new Clob($this->config, $clobHttpClient);
-        }
-
-        if ($dataHttpClient !== null) {
-            $this->dataClient = new Data($this->config, $dataHttpClient);
         }
 
         if ($bridgeHttpClient !== null) {
@@ -111,15 +104,11 @@ class Client
         return $this->clobClient;
     }
 
-    public function data(): Data
-    {
-        if ($this->dataClient === null) {
-            $this->dataClient = new Data($this->config);
-        }
-
-        return $this->dataClient;
-    }
-
+    /**
+     * Get Bridge API client for cross-chain deposits.
+     *
+     * @return Bridge
+     */
     public function bridge(): Bridge
     {
         if ($this->bridgeClient === null) {
