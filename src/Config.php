@@ -24,6 +24,10 @@ class Config
 
     public int $chainId;
 
+    public readonly int $defaultConcurrency;
+
+    public readonly int $asyncTimeout;
+
     /**
      * @param array<string, mixed> $options
      */
@@ -40,5 +44,7 @@ class Config
         $privateKeyValue = $options['private_key'] ?? ($_ENV['POLYMARKET_PRIVATE_KEY'] ?? null);
         $this->privateKey = is_string($privateKeyValue) ? $privateKeyValue : null;
         $this->chainId = is_int($options['chain_id'] ?? null) ? $options['chain_id'] : 137;
+        $this->defaultConcurrency = is_int($options['default_concurrency'] ?? null) ? $options['default_concurrency'] : 10;
+        $this->asyncTimeout = is_int($options['async_timeout'] ?? null) ? $options['async_timeout'] : 30;
     }
 }
