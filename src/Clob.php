@@ -15,6 +15,7 @@ use Danielgnh\PolymarketPhp\Resources\Clob\Orders;
 use Danielgnh\PolymarketPhp\Resources\Clob\OrderScoring;
 use Danielgnh\PolymarketPhp\Resources\Clob\Pricing;
 use Danielgnh\PolymarketPhp\Resources\Clob\Rewards;
+use Danielgnh\PolymarketPhp\Resources\Clob\Rfq;
 use Danielgnh\PolymarketPhp\Resources\Clob\Server;
 use Danielgnh\PolymarketPhp\Resources\Clob\Spreads;
 use Danielgnh\PolymarketPhp\Resources\Clob\Trades;
@@ -35,6 +36,7 @@ use Danielgnh\PolymarketPhp\Resources\Clob\Trades;
  * - Authentication: API key management
  * - Account: Balance, allowances, and notifications
  * - Rewards: Earnings and reward percentages
+ * - Rfq: Request for Quote (institutional trading)
  * - OrderScoring: Order scoring checks
  * - Server: Health checks and server info
  *
@@ -120,5 +122,10 @@ class Clob
     public function server(): Server
     {
         return new Server($this->httpClient);
+    }
+
+    public function rfq(): Rfq
+    {
+        return new Rfq($this->httpClient);
     }
 }
