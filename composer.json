@@ -1,9 +1,12 @@
 {
-    "name": "danielgnh/polymarket-php",
+    "name": "polymarket-php/polymarket",
     "description": "PHP Package for Polymarket API Integration",
     "license": "MIT",
     "keywords": ["polymarket", "api", "package", "prediction-markets", "polymarket-php"],
     "type": "library",
+    "replace": {
+        "danielgnh/polymarket-php": "^1.0"
+    },
     "require": {
         "php": "^8.1",
         "ext-gmp": "*",

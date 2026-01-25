@@ -7,11 +7,11 @@ You can search for the markets, events, create / delete orders and much more.
 [What is polymarket?](https://docs.polymarket.com/polymarket-learn/get-started/what-is-polymarket)
 
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/danielgnh/polymarket-php.svg?style=flat-square)](https://packagist.org/packages/danielgnh/polymarket-php)
-[![PHP Version](https://img.shields.io/packagist/php-v/danielgnh/polymarket-php.svg?style=flat-square)](https://packagist.org/packages/danielgnh/polymarket-php)
-[![Total Downloads](https://img.shields.io/packagist/dt/danielgnh/polymarket-php.svg?style=flat-square)](https://packagist.org/packages/danielgnh/polymarket-php)
-[![License](https://img.shields.io/packagist/l/danielgnh/polymarket-php.svg?style=flat-square)](https://packagist.org/packages/danielgnh/polymarket-php)
-[![Tests](https://img.shields.io/github/actions/workflow/status/danielgnh/polymarket-php/tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/danielgnh/polymarket-php/actions)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/polymarket-php/polymarket.svg?style=flat-square)](https://packagist.org/packages/polymarket-php/polymarket)
+[![PHP Version](https://img.shields.io/packagist/php-v/polymarket-php/polymarket.svg?style=flat-square)](https://packagist.org/packages/polymarket-php/polymarket)
+[![Total Downloads](https://img.shields.io/packagist/dt/polymarket-php/polymarket.svg?style=flat-square)](https://packagist.org/packages/polymarket-php/polymarket)
+[![License](https://img.shields.io/packagist/l/polymarket-php/polymarket.svg?style=flat-square)](https://packagist.org/packages/polymarket-php/polymarket)
+[![Tests](https://img.shields.io/github/actions/workflow/status/polymarket-php/polymarket/tests.yml?branch=main&label=tests&style=flat-square)](https://github.com/polymarket-php/polymarket/actions)
 [![PHPStan](https://img.shields.io/badge/PHPStan-level%209-brightgreen.svg?style=flat-square)](https://phpstan.org/)
 
 ## Requirements
@@ -24,7 +24,7 @@ You can search for the markets, events, create / delete orders and much more.
 Install the package via Composer:
 
 ```bash
-composer require danielgnh/polymarket-php
+composer require polymarket-php/polymarket
 ```
 
 ## Configuration
@@ -546,8 +546,8 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - [Polymarket Official Website](https://polymarket.com)
 - [Polymarket API Documentation](https://docs.polymarket.com)
-- [Package on Packagist](https://packagist.org/packages/danielgnh/polymarket-php)
+- [Package on Packagist](https://packagist.org/packages/polymarket-php/polymarket)
 
 ## Support
 
-For bugs and feature requests, please use the [GitHub issue tracker](https://github.com/danielgnh/polymarket-php-sdk/issues).
+For bugs and feature requests, please use the [GitHub issue tracker](https://github.com/polymarket-php/polymarket/issues).
