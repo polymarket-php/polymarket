@@ -23,7 +23,7 @@ class Orders extends Resource
             'offset' => $offset,
         ]);
 
-        return $this->httpClient->get('/orders', $params)->json();
+        return $this->httpClient->get('/data/orders', $params)->json();
     }
 
     /**
@@ -33,7 +33,7 @@ class Orders extends Resource
      */
     public function get(string $orderId): array
     {
-        return $this->httpClient->get("/orders/{$orderId}")->json();
+        return $this->httpClient->get("/data/order/{$orderId}")->json();
     }
 
     /**
