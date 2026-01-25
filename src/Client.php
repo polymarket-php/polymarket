@@ -49,7 +49,7 @@ class Client
             $this->bridgeClient = new Bridge($this->config, $bridgeHttpClient);
         }
 
-        if ($dataHttpClient !== null) {
+        if ($dataHttpClient instanceof HttpClientInterface) {
             $this->dataClient = new Data($this->config, $dataHttpClient);
         }
     }
@@ -125,7 +125,7 @@ class Client
 
     public function data(): Data
     {
-        if ($this->dataClient === null) {
+        if (!$this->dataClient instanceof Data) {
             $this->dataClient = new Data($this->config);
         }
 

@@ -28,12 +28,8 @@ use Danielgnh\PolymarketPhp\Resources\Data\Trades;
  */
 class Data
 {
-    private HttpClientInterface $httpClient;
+    private readonly HttpClientInterface $httpClient;
 
-    /**
-     * @param Config                   $config
-     * @param HttpClientInterface|null $httpClient
-     */
     public function __construct(
         private readonly Config $config,
         ?HttpClientInterface $httpClient = null
