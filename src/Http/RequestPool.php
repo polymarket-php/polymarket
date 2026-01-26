@@ -32,8 +32,9 @@ class RequestPool
                 $succeeded[$key] = $value;
             },
             function (Throwable $reason, int|string $key) use (&$failed): void {
-                /** @var PolymarketException $reason */
-                $failed[$key] = $reason;
+                $failed[$key] = $reason instanceof PolymarketException
+                    ? $reason
+                    : new PolymarketException($reason->getMessage(), $reason->getCode(), null, $reason);
             },
             $concurrency
         );
