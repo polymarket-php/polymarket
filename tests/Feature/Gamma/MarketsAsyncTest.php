@@ -55,9 +55,9 @@ describe('Markets::getBySlugAsync', function (): void {
 
 describe('Markets::getMany', function (): void {
     it('fetches multiple markets in parallel', function (): void {
-        $market1 = ['id' => 'id1', 'question' => 'Question 1'];
-        $market2 = ['id' => 'id2', 'question' => 'Question 2'];
-        $market3 = ['id' => 'id3', 'question' => 'Question 3'];
+        $market1 = ['id' => 1, 'question' => 'Question 1'];
+        $market2 = ['id' => 2, 'question' => 'Question 2'];
+        $market3 = ['id' => 3, 'question' => 'Question 3'];
 
         $this->fakeHttp->addJsonResponse('GET', '/markets/id1', $market1);
         $this->fakeHttp->addJsonResponse('GET', '/markets/id2', $market2);
@@ -65,30 +65,30 @@ describe('Markets::getMany', function (): void {
 
         $result = $this->client->gamma()->markets()->getMany(['id1', 'id2', 'id3']);
 
-        expect($result)->toBeInstanceOf(BatchResult::class);
-        expect($result->allSucceeded())->toBeTrue();
-        expect($result)->toHaveCount(3);
-        expect($result['id1'])->toBe($market1);
-        expect($result['id2'])->toBe($market2);
+        expect($result)->toBeInstanceOf(BatchResult::class)
+            ->and($result->allSucceeded())->toBeTrue()
+            ->and($result)->toHaveCount(3)
+            ->and($result['id1'])->toBe($market1)
+            ->and($result['id2'])->toBe($market2);
     });
 
     it('handles partial failures', function (): void {
-        $market1 = ['id' => 'id1', 'question' => 'Question 1'];
+        $market1 = ['id' => 1, 'question' => 'Question 1'];
 
         $this->fakeHttp->addJsonResponse('GET', '/markets/id1', $market1);
         $this->fakeHttp->addExceptionResponse('GET', '/markets/id2', new NotFoundException('Not found'));
 
         $result = $this->client->gamma()->markets()->getMany(['id1', 'id2']);
 
-        expect($result->hasFailures())->toBeTrue();
-        expect($result->succeeded)->toHaveCount(1);
-        expect($result->failed)->toHaveCount(1);
-        expect($result->failed['id2'])->toBeInstanceOf(NotFoundException::class);
+        expect($result->hasFailures())->toBeTrue()
+            ->and($result->succeeded)->toHaveCount(1)
+            ->and($result->failed)->toHaveCount(1)
+            ->and($result->failed['id2'])->toBeInstanceOf(NotFoundException::class);
     });
 
     it('iterates over succeeded results', function (): void {
-        $this->fakeHttp->addJsonResponse('GET', '/markets/id1', ['id' => 'id1']);
-        $this->fakeHttp->addJsonResponse('GET', '/markets/id2', ['id' => 'id2']);
+        $this->fakeHttp->addJsonResponse('GET', '/markets/id1', ['id' => 1]);
+        $this->fakeHttp->addJsonResponse('GET', '/markets/id2', ['id' => 2]);
 
         $result = $this->client->gamma()->markets()->getMany(['id1', 'id2']);
 
@@ -103,16 +103,16 @@ describe('Markets::getMany', function (): void {
 
 describe('Markets::getManyBySlug', function (): void {
     it('fetches multiple markets by slug in parallel', function (): void {
-        $market1 = ['id' => 'id1', 'slug' => 'slug1'];
-        $market2 = ['id' => 'id2', 'slug' => 'slug2'];
+        $market1 = ['id' => 1, 'slug' => 'slug1'];
+        $market2 = ['id' => 2, 'slug' => 'slug2'];
 
         $this->fakeHttp->addJsonResponse('GET', '/markets/slug/slug1', $market1);
         $this->fakeHttp->addJsonResponse('GET', '/markets/slug/slug2', $market2);
 
         $result = $this->client->gamma()->markets()->getManyBySlug(['slug1', 'slug2']);
 
-        expect($result)->toBeInstanceOf(BatchResult::class);
-        expect($result->allSucceeded())->toBeTrue();
-        expect($result['slug1'])->toBe($market1);
+        expect($result)->toBeInstanceOf(BatchResult::class)
+            ->and($result->allSucceeded())->toBeTrue()
+            ->and($result['slug1'])->toBe($market1);
     });
 });
