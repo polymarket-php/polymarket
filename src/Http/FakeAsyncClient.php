@@ -5,12 +5,15 @@ declare(strict_types=1);
 namespace Danielgnh\PolymarketPhp\Http;
 
 use Danielgnh\PolymarketPhp\Exceptions\PolymarketException;
+use GuzzleHttp\Promise\FulfilledPromise;
+use GuzzleHttp\Promise\PromiseInterface;
+use GuzzleHttp\Promise\RejectedPromise;
 
 /**
- * Fake HTTP client for testing purposes.
- * Allows setting up predefined responses without making real HTTP calls.
+ * Fake async client for testing purposes.
+ * Allows setting up predefined async responses without making real HTTP calls.
  */
-class FakeGuzzleHttpClient implements HttpClientInterface
+class FakeAsyncClient implements AsyncClientInterface
 {
     /** @var array<string, Response> */
     private array $responses = [];
@@ -21,39 +24,43 @@ class FakeGuzzleHttpClient implements HttpClientInterface
     /** @var array<string, PolymarketException> */
     private array $exceptions = [];
 
-    public function get(string $path, array $query = []): Response
-    {
-        $this->recordRequest('GET', $path, $query);
+    private readonly RequestPool $pool;
 
-        return $this->getResponse('GET', $path);
+    public function __construct()
+    {
+        $this->pool = new RequestPool();
     }
 
-    public function post(string $path, array $data = []): Response
+    /**
+     * @param array<string, mixed> $query
+     */
+    public function getAsync(string $path, array $query = []): PromiseInterface
     {
-        $this->recordRequest('POST', $path, $data);
-
-        return $this->getResponse('POST', $path);
+        return $this->requestAsync('GET', $path, $query);
     }
 
-    public function put(string $path, array $data = []): Response
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function postAsync(string $path, array $data = []): PromiseInterface
     {
-        $this->recordRequest('PUT', $path, $data);
-
-        return $this->getResponse('PUT', $path);
+        return $this->requestAsync('POST', $path, $data);
     }
 
-    public function delete(string $path, array $data = []): Response
+    /**
+     * @param array<string, mixed> $data
+     */
+    public function deleteAsync(string $path, array $data = []): PromiseInterface
     {
-        $this->recordRequest('DELETE', $path, $data);
-
-        return $this->getResponse('DELETE', $path);
+        return $this->requestAsync('DELETE', $path, $data);
     }
 
-    public function patch(string $path, array $data = []): Response
+    /**
+     * @param array<string, PromiseInterface> $promises
+     */
+    public function pool(array $promises, ?int $concurrency = null): BatchResult
     {
-        $this->recordRequest('PATCH', $path, $data);
-
-        return $this->getResponse('PATCH', $path);
+        return $this->pool->batch($promises, $concurrency);
     }
 
     /**
@@ -89,6 +96,12 @@ class FakeGuzzleHttpClient implements HttpClientInterface
         $this->addResponse($method, $path, $response);
     }
 
+    public function addExceptionResponse(string $method, string $path, PolymarketException $exception): void
+    {
+        $key = $this->makeKey($method, $path);
+        $this->exceptions[$key] = $exception;
+    }
+
     /**
      * Check if a specific request was made.
      */
@@ -99,10 +112,19 @@ class FakeGuzzleHttpClient implements HttpClientInterface
         return isset($this->requests[$key]);
     }
 
-    public function addExceptionResponse(string $method, string $path, PolymarketException $exception): void
+    /**
+     * @param array<int|string, mixed> $data
+     */
+    private function requestAsync(string $method, string $path, array $data): PromiseInterface
     {
+        $this->recordRequest($method, $path, $data);
         $key = $this->makeKey($method, $path);
-        $this->exceptions[$key] = $exception;
+
+        if (isset($this->exceptions[$key])) {
+            return new RejectedPromise($this->exceptions[$key]);
+        }
+
+        return new FulfilledPromise($this->getResponse($method, $path));
     }
 
     /**
@@ -125,12 +147,7 @@ class FakeGuzzleHttpClient implements HttpClientInterface
     {
         $key = $this->makeKey($method, $path);
 
-        if (isset($this->exceptions[$key])) {
-            throw $this->exceptions[$key];
-        }
-
         if (!isset($this->responses[$key])) {
-            // Return a default 404 response if no mock is set
             $body = json_encode([
                 'error' => 'Not Found',
                 'message' => "No fake response set for [$method $path]",

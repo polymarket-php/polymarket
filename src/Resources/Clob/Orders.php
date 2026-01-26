@@ -5,16 +5,16 @@ declare(strict_types=1);
 namespace Danielgnh\PolymarketPhp\Resources\Clob;
 
 use Danielgnh\PolymarketPhp\Exceptions\PolymarketException;
-use Danielgnh\PolymarketPhp\Http\AsyncClientInterface;
 use Danielgnh\PolymarketPhp\Http\BatchResult;
-use Danielgnh\PolymarketPhp\Http\HttpClientInterface;
 use Danielgnh\PolymarketPhp\Http\Response;
 use Danielgnh\PolymarketPhp\Resources\Resource;
+use Danielgnh\PolymarketPhp\Resources\Traits\HasAsyncClient;
 use GuzzleHttp\Promise\PromiseInterface;
-use RuntimeException;
 
 class Orders extends Resource
 {
+    use HasAsyncClient;
+
     /**
      * @param array<string, mixed> $filters
      *
@@ -199,18 +199,5 @@ class Orders extends Resource
     {
         return $this->getAsyncClient()->deleteAsync("/orders/{$orderId}")
             ->then(fn (Response $response): array => $response->json());
-    }
-
-    private function getAsyncClient(): HttpClientInterface|AsyncClientInterface
-    {
-        if ($this->asyncClient instanceof AsyncClientInterface) {
-            return $this->asyncClient;
-        }
-
-        if ($this->httpClient instanceof HttpClientInterface) {
-            return $this->httpClient;
-        }
-
-        throw new RuntimeException('AsyncClient not configured. Use the standard Client constructor.');
     }
 }

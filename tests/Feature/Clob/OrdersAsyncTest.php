@@ -3,20 +3,23 @@
 declare(strict_types=1);
 
 use Danielgnh\PolymarketPhp\Client;
+use Danielgnh\PolymarketPhp\Exceptions\AsyncClientNotConfiguredException;
 use Danielgnh\PolymarketPhp\Exceptions\NotFoundException;
 use Danielgnh\PolymarketPhp\Http\BatchResult;
+use Danielgnh\PolymarketPhp\Http\FakeAsyncClient;
 use Danielgnh\PolymarketPhp\Http\FakeGuzzleHttpClient;
 use GuzzleHttp\Promise\PromiseInterface;
 
 beforeEach(function (): void {
     $this->fakeHttp = new FakeGuzzleHttpClient();
-    $this->client = new Client(clobHttpClient: $this->fakeHttp);
+    $this->fakeAsync = new FakeAsyncClient();
+    $this->client = new Client(clobHttpClient: $this->fakeHttp, clobAsyncClient: $this->fakeAsync);
 });
 
 describe('Orders::getAsync', function (): void {
     it('returns a promise that resolves to order data', function (): void {
         $orderData = ['id' => 'order-1', 'status' => 'open'];
-        $this->fakeHttp->addJsonResponse('GET', '/data/order/order-1', $orderData);
+        $this->fakeAsync->addJsonResponse('GET', '/data/order/order-1', $orderData);
 
         $promise = $this->client->clob()->orders()->getAsync('order-1');
 
@@ -30,7 +33,7 @@ describe('Orders::getAsync', function (): void {
 describe('Orders::listAsync', function (): void {
     it('returns a promise that resolves to orders list', function (): void {
         $ordersData = ['orders' => [], 'next_cursor' => ''];
-        $this->fakeHttp->addJsonResponse('GET', '/data/orders', $ordersData);
+        $this->fakeAsync->addJsonResponse('GET', '/data/orders', $ordersData);
 
         $promise = $this->client->clob()->orders()->listAsync();
 
@@ -44,7 +47,7 @@ describe('Orders::listAsync', function (): void {
 describe('Orders::getOpenAsync', function (): void {
     it('returns a promise that resolves to open orders', function (): void {
         $ordersData = ['orders' => []];
-        $this->fakeHttp->addJsonResponse('GET', '/open-orders', $ordersData);
+        $this->fakeAsync->addJsonResponse('GET', '/open-orders', $ordersData);
 
         $promise = $this->client->clob()->orders()->getOpenAsync();
         $result = $promise->wait();
@@ -58,8 +61,8 @@ describe('Orders::getMany', function (): void {
         $order1 = ['id' => 'id1', 'status' => 'open'];
         $order2 = ['id' => 'id2', 'status' => 'filled'];
 
-        $this->fakeHttp->addJsonResponse('GET', '/data/order/id1', $order1);
-        $this->fakeHttp->addJsonResponse('GET', '/data/order/id2', $order2);
+        $this->fakeAsync->addJsonResponse('GET', '/data/order/id1', $order1);
+        $this->fakeAsync->addJsonResponse('GET', '/data/order/id2', $order2);
 
         $result = $this->client->clob()->orders()->getMany(['id1', 'id2']);
 
@@ -70,8 +73,8 @@ describe('Orders::getMany', function (): void {
     });
 
     it('handles partial failures', function (): void {
-        $this->fakeHttp->addJsonResponse('GET', '/data/order/id1', ['id' => 'id1']);
-        $this->fakeHttp->addExceptionResponse('GET', '/data/order/id2', new NotFoundException('Not found'));
+        $this->fakeAsync->addJsonResponse('GET', '/data/order/id1', ['id' => 'id1']);
+        $this->fakeAsync->addExceptionResponse('GET', '/data/order/id2', new NotFoundException('Not found'));
 
         $result = $this->client->clob()->orders()->getMany(['id1', 'id2']);
 
@@ -86,8 +89,8 @@ describe('Orders::cancelMany', function (): void {
         $result1 = ['id' => 'id1', 'cancelled' => true];
         $result2 = ['id' => 'id2', 'cancelled' => true];
 
-        $this->fakeHttp->addJsonResponse('DELETE', '/orders/id1', $result1);
-        $this->fakeHttp->addJsonResponse('DELETE', '/orders/id2', $result2);
+        $this->fakeAsync->addJsonResponse('DELETE', '/orders/id1', $result1);
+        $this->fakeAsync->addJsonResponse('DELETE', '/orders/id2', $result2);
 
         $result = $this->client->clob()->orders()->cancelMany(['id1', 'id2']);
 
@@ -97,8 +100,8 @@ describe('Orders::cancelMany', function (): void {
     });
 
     it('handles partial failures when cancelling', function (): void {
-        $this->fakeHttp->addJsonResponse('DELETE', '/orders/id1', ['cancelled' => true]);
-        $this->fakeHttp->addExceptionResponse('DELETE', '/orders/id2', new NotFoundException('Order not found'));
+        $this->fakeAsync->addJsonResponse('DELETE', '/orders/id1', ['cancelled' => true]);
+        $this->fakeAsync->addExceptionResponse('DELETE', '/orders/id2', new NotFoundException('Order not found'));
 
         $result = $this->client->clob()->orders()->cancelMany(['id1', 'id2']);
 
@@ -108,10 +111,19 @@ describe('Orders::cancelMany', function (): void {
     });
 
     it('uses lower default concurrency for write operations', function (): void {
-        $this->fakeHttp->addJsonResponse('DELETE', '/orders/id1', ['cancelled' => true]);
+        $this->fakeAsync->addJsonResponse('DELETE', '/orders/id1', ['cancelled' => true]);
 
         $result = $this->client->clob()->orders()->cancelMany(['id1'], concurrency: 3);
 
         expect($result->allSucceeded())->toBeTrue();
     });
+});
+
+describe('Orders async without async client', function (): void {
+    it('throws AsyncClientNotConfiguredException when async client is not configured', function (): void {
+        $httpOnly = new FakeGuzzleHttpClient();
+        $client = new Client(clobHttpClient: $httpOnly);
+
+        $client->clob()->orders()->getAsync('order-1');
+    })->throws(AsyncClientNotConfiguredException::class);
 });

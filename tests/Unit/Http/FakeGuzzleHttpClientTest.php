@@ -5,55 +5,58 @@ declare(strict_types=1);
 use Danielgnh\PolymarketPhp\Exceptions\NotFoundException;
 use Danielgnh\PolymarketPhp\Http\FakeGuzzleHttpClient;
 use Danielgnh\PolymarketPhp\Http\Response;
-use GuzzleHttp\Promise\PromiseInterface;
 
-describe('FakeGuzzleHttpClient async methods', function (): void {
-    it('getAsync returns fulfilled promise', function (): void {
+describe('FakeGuzzleHttpClient sync methods', function (): void {
+    it('get returns mocked response', function (): void {
         $fake = new FakeGuzzleHttpClient();
         $fake->addJsonResponse('GET', '/test', ['id' => '123']);
 
-        $promise = $fake->getAsync('/test');
+        $response = $fake->get('/test');
 
-        expect($promise)->toBeInstanceOf(PromiseInterface::class);
-
-        $response = $promise->wait();
         expect($response)->toBeInstanceOf(Response::class);
         expect($response->json())->toBe(['id' => '123']);
     });
 
-    it('postAsync returns fulfilled promise', function (): void {
+    it('post returns mocked response', function (): void {
         $fake = new FakeGuzzleHttpClient();
         $fake->addJsonResponse('POST', '/test', ['created' => true]);
 
-        $response = $fake->postAsync('/test', ['data' => 'value'])->wait();
+        $response = $fake->post('/test', ['data' => 'value']);
 
         expect($response->json())->toBe(['created' => true]);
     });
 
-    it('deleteAsync returns fulfilled promise', function (): void {
+    it('delete returns mocked response', function (): void {
         $fake = new FakeGuzzleHttpClient();
         $fake->addJsonResponse('DELETE', '/test', ['deleted' => true]);
 
-        $response = $fake->deleteAsync('/test')->wait();
+        $response = $fake->delete('/test');
 
         expect($response->json())->toBe(['deleted' => true]);
     });
 
-    it('async methods return fulfilled promise for missing mocks with 404 response', function (): void {
+    it('returns 404 response for missing mocks', function (): void {
         $fake = new FakeGuzzleHttpClient();
 
-        $promise = $fake->getAsync('/unknown');
-        $response = $promise->wait();
+        $response = $fake->get('/unknown');
 
         expect($response->statusCode())->toBe(404);
     });
 
-    it('addExceptionResponse causes rejection', function (): void {
+    it('tracks requests via hasRequest', function (): void {
+        $fake = new FakeGuzzleHttpClient();
+        $fake->addJsonResponse('GET', '/test', ['id' => '123']);
+
+        $fake->get('/test');
+
+        expect($fake->hasRequest('GET', '/test'))->toBeTrue();
+        expect($fake->hasRequest('POST', '/test'))->toBeFalse();
+    });
+
+    it('addExceptionResponse causes exception on sync call', function (): void {
         $fake = new FakeGuzzleHttpClient();
         $fake->addExceptionResponse('GET', '/error', new NotFoundException('Not found'));
 
-        $promise = $fake->getAsync('/error');
-
-        expect(fn () => $promise->wait())->toThrow(NotFoundException::class);
+        expect(fn (): Response => $fake->get('/error'))->toThrow(NotFoundException::class);
     });
 });

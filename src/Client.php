@@ -31,20 +31,20 @@ class Client
     public function __construct(
         ?string $apiKey = null,
         array $options = [],
-        HttpClientInterface|AsyncClientInterface|null $gammaHttpClient = null,
-        HttpClientInterface|AsyncClientInterface|null $clobHttpClient = null,
-        ?HttpClientInterface $bridgeHttpClient = null
+        ?HttpClientInterface $gammaHttpClient = null,
+        ?HttpClientInterface $clobHttpClient = null,
+        ?HttpClientInterface $bridgeHttpClient = null,
+        ?AsyncClientInterface $gammaAsyncClient = null,
+        ?AsyncClientInterface $clobAsyncClient = null,
     ) {
         $this->config = new Config($apiKey, $options);
 
         if ($gammaHttpClient instanceof HttpClientInterface) {
-            $asyncClient = $gammaHttpClient instanceof AsyncClientInterface ? $gammaHttpClient : null;
-            $this->gammaClient = new Gamma($this->config, $gammaHttpClient, $asyncClient);
+            $this->gammaClient = new Gamma($this->config, $gammaHttpClient, $gammaAsyncClient);
         }
 
         if ($clobHttpClient instanceof HttpClientInterface) {
-            $asyncClient = $clobHttpClient instanceof AsyncClientInterface ? $clobHttpClient : null;
-            $this->clobClient = new Clob($this->config, $clobHttpClient, null, $asyncClient);
+            $this->clobClient = new Clob($this->config, $clobHttpClient, null, $clobAsyncClient);
         }
 
         if ($bridgeHttpClient instanceof HttpClientInterface) {
