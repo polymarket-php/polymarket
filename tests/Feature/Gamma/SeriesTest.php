@@ -34,6 +34,22 @@ describe('Series::list()', function (): void {
             ->and($result[0]['title'])->toBe('NBA Finals 2024');
     });
 
+    it('applies custom filters', function (): void {
+        $seriesData = $this->loadFixture('series_list.json');
+        $filteredData = array_filter($seriesData, fn ($s): bool => 'abc' === $s['slug']);
+
+        $this->fakeHttp->addJsonResponse('GET', '/series', array_values($filteredData));
+
+        $result = $this->client->gamma()->series()->list(filters: ['slug' => 'abc']);
+
+        expect($result)->toBeArray()
+            ->and(count($result))->toBe(1);
+
+        foreach ($result as $market) {
+            expect($market['slug'])->toBe('abc');
+        }
+    });
+
     it('handles empty series list', function (): void {
         $this->fakeHttp->addJsonResponse('GET', '/series', []);
 

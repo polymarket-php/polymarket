@@ -1,0 +1,17 @@
+[
+  {
+    "id": "1234",
+    "title": "Abc",
+    "slug": "abc"
+  },
+  {
+    "id": "5678",
+    "title": "Def",
+    "slug": "def"
+  },
+  {
+    "id": "9012",
+    "title": "Ghi",
+    "slug": "ghi"
+  }
+]
